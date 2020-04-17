@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Introduction</title>
+        <meta charset="utf-8" />
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="https://sensorscape.github.io/theme/static/css/style.css" rel="stylesheet" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <link href="https://sensorscape.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="SensorScape Docs Full Atom Feed" />
+    </head>
+
+    <body id="index" class="archive">
+        <div class="container">
+            <div class="header">
+                <ul class="nav nav-pills pull-right">
+                    <li class=""><a href="https://sensorscape.github.io">Home</a></li>
+                    <li class="active"><a href="https://sensorscape.github.io/">Introduction</a></li>
+                    <li><a href="https://sensorscape.github.io/archives.html">Archives</a></li>
+                </ul>
+                <h3 class="text-muted"><a href="https://sensorscape.github.io">SensorScape Docs</a></h3>
+				<h2 class="text-muted"></h2>
+             </div>
+    <h1>Introduction</h1>
+    
+
+    <p><br/>
+<span class="math">\(\{Efficiently, Reliably\} \times \{Collect, Transport, Store, Analyze\}\)</span></p>
+<hr>
+<p>SensorScape is a system for wrangling metrics.  Its provisional motto is "Master your own Internet of Things".</p>
+<p>The system consists of:</p>
+<ol>
+<li>Modules, which take measurements (derive metrics) from <em>anything you want</em>, and send them to:</li>
+<li>Clients, which forward these metrics to:</li>
+<li>A server, which stores metrics and copies them to:</li>
+<li>An analysis pipeline, which discovers relationships between metric series, performs statistical analysis on individual series, and more.  The resultant "products" can be viewed and interacted with via:</li>
+<li>A visualization front end</li>
+</ol>
+<p>The system is built so that when a communications failure occurs between modules and the client, between the client and the server, or between two server components, data is stored (while collection continues) until service is restored.</p>
+<h1>Collect</h1>
+<h2>Modules and Clients</h2>
+<p>The diagram below serves as a terse introduction to the module and client layers of the system.</p>
+<p><br/>
+<img alt="sensorscape client" src="https://sensorscape.github.io/images/client.png">
+<br/>
+<br/></p>
+<h3>Key concepts:</h3>
+<ol>
+<li>
+<p>Purple boxes are modules.  Modules are software that can run on the client hardware (blue box), or other hardware (e.g. embedded devices).  You can run any modules you need, but you don't have to run any.  Modules can query hardware (or other software) on the device it resides on, or other devices (through USB, serial, etc).</p>
+</li>
+<li>
+<p>The client software (green box) can run on lightweight commodity hardware, even something small like a Raspberry Pi.  The client communicates to the server using whatever network the sytem it lives on uses - metrics can traverse the Internet, a LAN, a VPN, or anything else.</p>
+</li>
+<li>
+<p>Clients can be static or mobile.  Location data can be correlated with other metrics in the formulation of analysis products.  In the example above, GPS data is gathered by the GPS module, and radio channel power data is gathered by the FreqWatch module.  Both metrics are sent by the client to the server for processing, and can be analyzed together alongside the metrics from another client in another location.</p>
+</li>
+<li>
+<p>The timestamp for a metric is applied when the measurement is taken (at the module).  A different timestamp is recorded by the server upon message receipt for potential analysis of network jitter, etc.</p>
+</li>
+<li>
+<p>The interface between a module and the client is simple and defined in such a way that anyone can construct their own modules and take advantage of the SensorScape system.  There are also proxy modules that one can feed data to (via a pipe, for example) to easily send custom metrics.</p>
+</li>
+<li>
+<p>The modules reside in a separate code repository than the client.  The intention is for the modules repository to be added to by the community, as they develop modules for their own purposes.  It's hoped that the modules repository will grow large in time, providing modules for a multitude of purposes.</p>
+</li>
+<li>
+<p>Modules can load module-specific parameters from the server.  This is a powerful way to coordinate collection of metrics.  For example, geographically distributed nodes monitoring for activity on a set of radio frequencies could be given an updated set of frequencies by the server.  These nodes will thus have their monitoring controlled and synchronized by the server.</p>
+</li>
+</ol>
+<h1>Transport</h1>
+<p><a href="https://zeromq.org/">ZMQ</a> provides the foundation for transporting metrics reliably between modules and the storage and analysis pipelines.  Additional code ensures metrics are not considered delivered until they've been acknowledged by the server.  The system can crash at any point, and queued messages will be reliably delivered when service is restored.</p>
+<p>Authentication and encryption are provided by <a href="http://api.zeromq.org/master:zmq-curve">ZMQ CURVE</a>.  Each client has its own CURVE keypair, and the server must have registered the public key from a client's keypair in order to accept metrics from that client.  Deleting the client's public key on the server immediately prevents the client from sending more metrics.</p>
+<h1>Store</h1>
+<h1>Analyze</h1>
+<p>Analysis will be discussed in its own set of pages.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+            <footer id="contentinfo" class="footer">
+                    <nav class="pull-right bottom-nav">
+                        <a href="https://sensorscape.github.io/feeds/all.atom.xml">RSS</a>
+                    </nav>
+                    <address id="about" class="vcard body">
+                    &copy; <a href="https://sensorscape.github.io">SensorScape Docs</a> Proudly powered by <a href="http://getpelican.com/">Pelican</a>
+                    </address><!-- /#about -->
+            </footer><!-- /#contentinfo -->
+        </div><!-- container -->
+    </body>
+</html>
