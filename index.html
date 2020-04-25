@@ -25,24 +25,26 @@
     <p><br/>
 <span class="math">\(\{Efficiently, Reliably\} \times \{Collect, Transport, Store, Analyze\}\)</span></p>
 <hr>
-<p>SensorScape is a system for wrangling metrics.  Its provisional motto is "Master Your Own Internet of Things".</p>
-<p><em>SensorScape is efficient</em>:  It aims to replace the patchwork of in-house solutions for collecting and processing data collected from sensors and other such devices.</p>
-<p><em>SensorScape is resilient</em>:  When a communications failure occurs between modules and the client, between the client and the server, or between server components, metrics are stored at the link before the break (while collection continues), and forwarded on when service is restored.</p>
+<p class="lead">
+SensorScape is a system for wrangling metrics.  It handles <strong>collection</strong> of metrics (from sensors for example), <strong>transportation</strong> of metrics to a back end, efficient <strong>storage</strong> of metric series, and automated <strong>analysis</strong> for finding trends and relationships in and among series.
+</p>
+
+<h3>Composition</h3>
 <p>The system consists of:</p>
 <ol>
 <li>Modules, which take measurements from <em>anything you want</em>, and send them as 'metrics' to:</li>
-<li>Clients, which forward these metrics to:</li>
+<li>Clients, which forward metrics to:</li>
 <li>A server, which stores them and copies them to:</li>
 <li>An analysis pipeline, which discovers relationships between metric series, performs statistical analysis on individual series, and more.  The resultant "products" can be viewed and interacted with via:</li>
 <li>A visualization front end</li>
 </ol>
-<h1>Collect</h1>
+<h2>Collect</h2>
 <p>The diagram below serves as a terse introduction to the module and client layers of the system.</p>
 <p><br/>
 <img alt="sensorscape client" src="/images/client.png">
 <br/>
 <br/></p>
-<h2>Key concepts:</h2>
+<h3>Key concepts:</h3>
 <ol>
 <li>
 <p>Purple boxes are modules.  Modules are software that can run on the client hardware (blue box), or other hardware (e.g. embedded devices).  You can run any modules you need, but you don't have to run any.  Modules query hardware (or software) on the device it resides on, or other devices (through USB, serial, etc), and packages the results of its queries into 'metrics'.</p>
@@ -69,6 +71,7 @@
 <h1>Transport</h1>
 <p><a href="https://zeromq.org/">ZMQ</a> provides the foundation for transporting metrics reliably between modules and the storage and analysis pipelines.  Additional code ensures metrics are not considered delivered until they've been acknowledged by the server.  The system can crash at any point, and queued messages will be reliably delivered when service is restored.</p>
 <p>Authentication and encryption are provided by <a href="http://api.zeromq.org/master:zmq-curve">ZMQ CURVE</a>.  Each client has its own CURVE keypair, and the server must have registered the public key from a client's keypair in order to accept metrics from that client.  Deleting the client's public key on the server immediately prevents the client from sending more metrics.</p>
+<p>When a communications failure occurs between modules and the client, between the client and the server, or between server components, metrics are stored at the link before the break (while collection continues), and forwarded on when service is restored.</p>
 <h1>Store</h1>
 <p>Metrics are accepted by a server-side gateway and sent to a Kafka cluster.  An ingestor copies them from Kafka into a time-series database (TSDB).  The TSDB stores metric series in raw form, which is usable for basic visualizations (graphs) and for performing first-order operations on series (such as calculating a mean).</p>
 <p>The same metrics are read from Kafka into an analysis pipeline.  This pipeline consists of several parallel paths that perform independent analysis on metrics.  Such analysis includes deriving basic statistical properties (mean, standard deviation, etc.), time-series analysis (where applicable), and comparing each series to each other series owned by the same organization, to try and detect relationships between the processes that generated the metrics under analysis.</p>
