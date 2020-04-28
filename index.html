@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Introduction</title>
+        <title>SensorScape - Introduction</title>
         <meta charset="utf-8" />
         <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" />
         <link href="/theme/static/css/style.css" rel="stylesheet" />
@@ -16,8 +16,8 @@
                     <li class="active"><a href="/">Introduction</a></li>
                     <li><a href="/archives.html">Archives</a></li>
                 </ul>
-                <h3 class="text-muted"><a href="">SensorScape</a></h3>
-				<h2 class="text-muted"></h2>
+                <h2 class="text-muted"><a href="">SensorScape</a></h2>
+				<h4 class="text-muted"><i>Master Your Own Internet of Things</i></h4>
              </div>
     <h1>Introduction</h1>
     
@@ -29,54 +29,52 @@
 SensorScape is a system for wrangling metrics.  It handles <strong>collection</strong> of metrics (from sensors for example), <strong>transportation</strong> of metrics to a back end, efficient <strong>storage</strong> of metric series, and automated <strong>analysis</strong> for finding trends and relationships in and among series.
 </p>
 
-<h3>Composition</h3>
 <p>The system consists of:</p>
 <ol>
-<li>Modules, which take measurements from <em>anything you want</em>, and send them as 'metrics' to:</li>
-<li>Clients, which forward metrics to:</li>
-<li>A server, which stores them and copies them to:</li>
-<li>An analysis pipeline, which discovers relationships between metric series, performs statistical analysis on individual series, and more.  The resultant "products" can be viewed and interacted with via:</li>
-<li>A visualization front end</li>
+<li><u>Modules</u>, which pull metrics from <em>anything you want</em>, and sends them to:</li>
+<li>A <u>client</u>, which forwards them to:</li>
+<li>A <u>server</u>, which stores them and copies them to:</li>
+<li>An <u>analysis pipeline</u>, which discovers relationships between metric series, performs statistical analysis on series, and more.  The resultant <em>products</em> can be viewed and interacted with via:</li>
+<li>A <u>visualization front end</u>.</li>
 </ol>
-<h2>Collect</h2>
+<h3><u>Collect</u></h3>
 <p>The diagram below serves as a terse introduction to the module and client layers of the system.</p>
 <p><br/>
 <img alt="sensorscape client" src="/images/client.png">
 <br/>
 <br/></p>
-<h3>Key concepts:</h3>
+<h4>Key concepts:</h4>
 <ol>
 <li>
-<p>Purple boxes are modules.  Modules are software that can run on the client hardware (blue box), or other hardware (e.g. embedded devices).  You can run any modules you need, but you don't have to run any.  Modules query hardware (or software) on the device it resides on, or other devices (through USB, serial, etc), and packages the results of its queries into 'metrics'.</p>
+<p><span style="background-color:purple; color:white; padding:1px;">Purple boxes</span> in the diagram are modules.  Modules are software that can run on the client hardware (the <span style="background-color:blue; color:white; padding:1px;">blue box</span>), or other hardware (e.g. embedded devices).  Modules query hardware or software on the device it resides on, or other devices (through USB, serial, etc), and packages the results of its queries into 'metrics'.</p>
 </li>
 <li>
-<p>The client software (green box) can run on lightweight commodity hardware, even something small like a Raspberry Pi.  The client communicates to the server using whatever network the sytem it lives on uses - metrics can traverse the Internet, a LAN, a VPN, or anything else.</p>
+<p>The client software (the <span style="background-color:green; color:white; padding:1px;">green box</span>) can run on lightweight commodity hardware.  The client communicates to the server using the network of the sytem it lives on uses - metrics can traverse the Internet, a LAN, a VPN, or anything else.</p>
 </li>
 <li>
-<p>Clients can be static or mobile.  Location data can be correlated with other metrics in the formulation of analysis products.  In the example above, GPS data is gathered by the GPS module, and radio channel power data is gathered by the FreqWatch module.  Both metrics are sent by the client to the server for processing, and can be analyzed together alongside the metrics from another client in another location.</p>
+<p>Clients can be static or mobile.  Location data can be correlated with other metrics in the formulation of analysis products.  In the example above, GPS data is gathered by the GPS module, and radio channel power data is gathered by the FreqWatch module.</p>
 </li>
 <li>
-<p>The timestamp for a metric is applied when the measurement is taken (at the module).  A different timestamp is recorded by the server upon message receipt for potential analysis of network jitter, etc.</p>
+<p>The main timestamp for a metric is applied when the measurement is taken (at the module).  Another timestamp is recorded by the server upon message receipt for potential analysis of network jitter, etc.</p>
 </li>
 <li>
-<p>The interface between a module and the client is simple and defined in such a way that anyone can construct their own modules and take advantage of the SensorScape system.  There are also proxy modules that one can feed data to (via a pipe, for example) to easily send custom metrics.</p>
+<p>The interface between a module and the client is simple and defined in such a way that anyone can construct their own modules and take advantage of the SensorScape system.  There are also proxy modules that one can feed data into via a pipe or socket, to easily send custom metrics.</p>
 </li>
 <li>
-<p>The modules reside in a separate code repository than the client.  The intention is for the modules repository to be added to by the community, as they develop modules for their own purposes.  It's hoped that the modules repository will grow large in time, providing modules for a multitude of purposes.</p>
+<p>Modules reside in a separate code repository than the client.  The intention is for the modules repository to grow as its contributed to by the community, as developers create modules for their own needs.</p>
 </li>
 <li>
-<p>Modules can load module-specific parameters from the server.  This is a powerful way to coordinate collection of metrics.  For example, geographically distributed nodes monitoring for activity on a set of radio frequencies could be given an updated set of frequencies by the server.  These nodes will thus have their monitoring controlled and synchronized by the server.</p>
+<p>Modules can load module-specific parameters from the server.  This is a powerful way to coordinate collection of metrics.  For example, geographically distributed nodes monitoring for activity on a set of radio frequencies could be given an updated set of frequencies by the server.  These nodes would thus have their monitoring controlled and synchronized by the server.</p>
 </li>
 </ol>
-<h1>Transport</h1>
-<p><a href="https://zeromq.org/">ZMQ</a> provides the foundation for transporting metrics reliably between modules and the storage and analysis pipelines.  Additional code ensures metrics are not considered delivered until they've been acknowledged by the server.  The system can crash at any point, and queued messages will be reliably delivered when service is restored.</p>
-<p>Authentication and encryption are provided by <a href="http://api.zeromq.org/master:zmq-curve">ZMQ CURVE</a>.  Each client has its own CURVE keypair, and the server must have registered the public key from a client's keypair in order to accept metrics from that client.  Deleting the client's public key on the server immediately prevents the client from sending more metrics.</p>
-<p>When a communications failure occurs between modules and the client, between the client and the server, or between server components, metrics are stored at the link before the break (while collection continues), and forwarded on when service is restored.</p>
-<h1>Store</h1>
+<h3><u>Transport</u></h3>
+<p><a href="https://zeromq.org/">ZMQ</a> is used to transport metrics from the modules to the client, and from the client to the server.  Authentication and encryption are provided by <a href="http://api.zeromq.org/master:zmq-curve">ZMQ CURVE</a>.  Each client has its own CURVE keypair, and the server must have registered the public key from a client's keypair in order to accept metrics from that client.</p>
+<p>When a communications failure occurs between modules and the client, between the client and the server, or between server components, metrics are accumulated at the before the break (while collection continues), and are forwarded on when service is restored.</p>
+<h3><u>Store</u></h3>
 <p>Metrics are accepted by a server-side gateway and sent to a Kafka cluster.  An ingestor copies them from Kafka into a time-series database (TSDB).  The TSDB stores metric series in raw form, which is usable for basic visualizations (graphs) and for performing first-order operations on series (such as calculating a mean).</p>
 <p>The same metrics are read from Kafka into an analysis pipeline.  This pipeline consists of several parallel paths that perform independent analysis on metrics.  Such analysis includes deriving basic statistical properties (mean, standard deviation, etc.), time-series analysis (where applicable), and comparing each series to each other series owned by the same organization, to try and detect relationships between the processes that generated the metrics under analysis.</p>
-<h1>Analyze</h1>
-<p>Analysis is discussed in its own set of pages.</p>
+<h3><u>Analyze</u></h3>
+<p>Analysis is covered in its own set of pages.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -140,9 +138,6 @@ SensorScape is a system for wrangling metrics.  It handles <strong>collection</s
 }
 </script>
             <footer id="contentinfo" class="footer">
-                    <nav class="pull-right bottom-nav">
-                        <a href="/None">RSS</a>
-                    </nav>
                     <address id="about" class="vcard body">
                     &copy; <a href="">SensorScape</a> Proudly powered by <a href="http://getpelican.com/">Pelican</a>
                     </address><!-- /#about -->
