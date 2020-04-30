@@ -46,33 +46,33 @@ SensorScape is a system for wrangling metrics.  It handles <strong>collection</s
 <h4>Key concepts:</h4>
 <ol>
 <li>
-<p><span style="background-color:purple; color:white; padding:1px;">Purple boxes</span> in the diagram are modules.  Modules are software that can run on the client hardware (the <span style="background-color:blue; color:white; padding:1px;">blue box</span>), or other hardware (e.g. embedded devices).  Modules query hardware or software on the device it resides on, or other devices (through USB, serial, etc), and packages the results of its queries into 'metrics'.</p>
+<p>The <span style="background-color:purple; color:white; padding:1px;">purple boxes</span> in the diagram are modules.  Modules are software that can run on the client hardware (the <span style="background-color:blue; color:white; padding:1px;">blue box</span>), or other hardware (e.g. embedded devices).  Modules query devices (through local sockets, USB, serial, etc), and package interesting information into metrics.</p>
 </li>
 <li>
-<p>The client software (the <span style="background-color:green; color:white; padding:1px;">green box</span>) can run on lightweight commodity hardware.  The client communicates to the server using the network of the sytem it lives on uses - metrics can traverse the Internet, a LAN, a VPN, or anything else.</p>
+<p>The client software (the <span style="background-color:green; color:white; padding:1px;">green box</span>) negotiates and maintains a reliable connection a server, and can run on lightweight hardware.  The client communicates to the server using the network of the sytem it lives on, so the metrics it forwards can traverse a LAN, a VPN, or anything else.</p>
 </li>
 <li>
-<p>Clients can be static or mobile.  Location data can be correlated with other metrics in the formulation of analysis products.  In the example above, GPS data is gathered by the GPS module, and radio channel power data is gathered by the FreqWatch module.</p>
+<p>Clients can be mobile.  Location data can be used together with data from other sources during analysis.</p>
 </li>
 <li>
-<p>The main timestamp for a metric is applied when the measurement is taken (at the module).  Another timestamp is recorded by the server upon message receipt for potential analysis of network jitter, etc.</p>
+<p>The primary timestamp for a metric is applied when the measurement is taken (at the module).  Another timestamp is applied by the server upon receipt for analysis of system latency and jitter.</p>
 </li>
 <li>
 <p>The interface between a module and the client is simple and defined in such a way that anyone can construct their own modules and take advantage of the SensorScape system.  There are also proxy modules that one can feed data into via a pipe or socket, to easily send custom metrics.</p>
 </li>
 <li>
-<p>Modules reside in a separate code repository than the client.  The intention is for the modules repository to grow as its contributed to by the community, as developers create modules for their own needs.</p>
+<p>Modules reside in a separate code repository than the client.  The intention is for this <i>modules repository</i> to grow as developers create modules to address their own needs.</p>
 </li>
 <li>
-<p>Modules can load module-specific parameters from the server.  This is a powerful way to coordinate collection of metrics.  For example, geographically distributed nodes monitoring for activity on a set of radio frequencies could be given an updated set of frequencies by the server.  These nodes would thus have their monitoring controlled and synchronized by the server.</p>
+<p>Modules can load module-specific parameters from the server.  This is a powerful way to coordinate collection of metrics.  For example, geographically distributed nodes monitoring for activity on a set of radio frequencies could be given an updated set of frequencies by the server.  The nodes would thus have their monitoring controlled and synchronized by the server.</p>
 </li>
 </ol>
 <h3><u>Transport</u></h3>
-<p><a href="https://zeromq.org/">ZMQ</a> is used to transport metrics from the modules to the client, and from the client to the server.  Authentication and encryption are provided by <a href="http://api.zeromq.org/master:zmq-curve">ZMQ CURVE</a>.  Each client has its own CURVE keypair, and the server must have registered the public key from a client's keypair in order to accept metrics from that client.</p>
-<p>When a communications failure occurs between modules and the client, between the client and the server, or between server components, metrics are accumulated at the before the break (while collection continues), and are forwarded on when service is restored.</p>
+<p><a href="https://zeromq.org/">ZMQ</a> is used to transport metrics from the modules to the client, and from the client to the server.  Authentication and encryption are provided by <a href="http://api.zeromq.org/master:zmq-curve">ZMQ CURVE</a>.  Each client has its own CURVE keypair, and the server must have registered the public key from a client's keypair in order to accept metrics from that client.  The server does not have access to a client's private key.</p>
+<p>When a communications failure occurs between a module and the client, between the client and the server, or between server components, metrics are accumulated at the point before the break, while collection continues.  At service restoration accumulated metrics are forwarded on.</p>
 <h3><u>Store</u></h3>
-<p>Metrics are accepted by a server-side gateway and sent to a Kafka cluster.  An ingestor copies them from Kafka into a time-series database (TSDB).  The TSDB stores metric series in raw form, which is usable for basic visualizations (graphs) and for performing first-order operations on series (such as calculating a mean).</p>
-<p>The same metrics are read from Kafka into an analysis pipeline.  This pipeline consists of several parallel paths that perform independent analysis on metrics.  Such analysis includes deriving basic statistical properties (mean, standard deviation, etc.), time-series analysis (where applicable), and comparing each series to each other series owned by the same organization, to try and detect relationships between the processes that generated the metrics under analysis.</p>
+<p>Metrics are accepted by a server-side gateway and sent to a Kafka cluster.  An ingestor copies them from Kafka into a time-series database (TSDB).  The TSDB stores metric series in raw form, which is usable for basic visualizations (graphs).</p>
+<p>The same metrics are read from Kafka into an analysis pipeline.  This pipeline consists of several parallel paths that derive basic statistical properties (mean, standard deviation, etc.), perform time-series analysis (where applicable), and detect relationships between series.</p>
 <h3><u>Analyze</u></h3>
 <p>Analysis is covered in its own set of pages.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
