@@ -49,7 +49,7 @@ SensorScape is a system for wrangling metrics.  It handles <strong>collection</s
 <p>The <span style="background-color:purple; color:white; padding:1px;">purple boxes</span> in the diagram are modules.  Modules are software that can run on the client hardware (the <span style="background-color:blue; color:white; padding:1px;">blue box</span>), or other hardware (e.g. embedded devices).  Modules query devices (through local sockets, USB, serial, etc), and package interesting information into metrics.</p>
 </li>
 <li>
-<p>The client software (the <span style="background-color:green; color:white; padding:1px;">green box</span>) negotiates and maintains a reliable connection a server, and can run on lightweight hardware.  The client communicates to the server using the network of the sytem it lives on, so the metrics it forwards can traverse a LAN, a VPN, or anything else.</p>
+<p>The client software (the <span style="background-color:green; color:white; padding:1px;">green box</span>) negotiates and maintains a reliable connection a server, and can run on lightweight hardware.  The client communicates to the server using the network of the system it lives on, so the metrics it forwards can traverse a LAN, a VPN, or anything else.</p>
 </li>
 <li>
 <p>Clients can be mobile.  Location data can be used together with data from other sources during analysis.</p>
@@ -75,6 +75,8 @@ SensorScape is a system for wrangling metrics.  It handles <strong>collection</s
 <p>The same metrics are read from Kafka into an analysis pipeline.  This pipeline consists of several parallel paths that derive basic statistical properties (mean, standard deviation, etc.), perform time-series analysis (where applicable), and detect relationships between series.</p>
 <h3><u>Analyze</u></h3>
 <p>Analysis is covered in its own set of pages.</p>
+<h3><u>Contact</u></h3>
+<p>sensorscape /at/ sensorscape ! io</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
