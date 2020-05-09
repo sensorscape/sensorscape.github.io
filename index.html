@@ -68,7 +68,8 @@ SensorScape is a system for wrangling metrics.  It handles <strong>collection</s
 </li>
 </ol>
 <h3><u>Transport</u></h3>
-<p><a href="https://zeromq.org/">ZMQ</a> is used to transport metrics from the modules to the client, and from the client to the server.  Authentication and encryption are provided by <a href="http://api.zeromq.org/master:zmq-curve">ZMQ CURVE</a>.  Each client has its own CURVE keypair, and the server must have registered the public key from a client's keypair in order to accept metrics from that client.  The server does not have access to a client's private key.</p>
+<p>The SensorScape client is a gateway handles reliability and security for delivery of metrics to the server.  The communication between modules and the client is dependent on the needs of the user; modules could reside on the client hardware itself, or they could be located on small, low-power embedded devices.  The important part is for metrics to make their way to the client, and eventually the server.</p>
+<p><a href="https://zeromq.org/">ZMQ</a> is used to transport metrics from the client to the server.  Authentication and encryption are provided by <a href="http://api.zeromq.org/master:zmq-curve">ZMQ CURVE</a>.  Each client has its own CURVE keypair, and the server must have registered the public key from a client's keypair in order to accept metrics from that client.  The server does not have access to a client's private key.</p>
 <p>When a communications failure occurs between a module and the client, between the client and the server, or between server components, metrics are accumulated at the point before the break, while collection continues.  At service restoration accumulated metrics are forwarded on.</p>
 <h3><u>Store</u></h3>
 <p>Metrics are accepted by a server-side gateway and sent to a Kafka cluster.  An ingestor copies them from Kafka into a time-series database (TSDB).  The TSDB stores metric series in raw form, which is usable for basic visualizations (graphs).</p>
@@ -79,7 +80,6 @@ SensorScape is a system for wrangling metrics.  It handles <strong>collection</s
 <p>Please <a href="mailto:sensorscapesup@sensorscape.io">contact us</a> for information on obtaining and deploying SensorScape on your devices.</p>
 <h3><u>Contact</u></h3>
 <p>sensorscape /at/ sensorscape ! io</p>
-<p><a href="" title="- docs: demos w/ good graphics for different sensors, models, highlight functionality of the page">comment</a>: &lt;&gt; (At bottom of intro page, a section with various types of concise examples: gps on a moving vehicle, web hits, server ping deviation, thermometer, radio)) (visuals important) 3 examples w/ viz</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
